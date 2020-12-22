@@ -16,16 +16,15 @@ import retrofit2.Retrofit
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = this::class.java.simpleName
     private lateinit var retrofit : Retrofit
     private lateinit var supplementService : RetrofitService
-
     lateinit var textView : TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initRetrofit()
+        retrofit = RetrofitClient.getInstance()
+        supplementService = retrofit.create(RetrofitService::class.java)
 
 
         textView = findViewById(R.id.textView)
@@ -34,25 +33,18 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initRetrofit(){
-
-        retrofit = RetrofitClient.getInstance()
-        supplementService = retrofit.create(RetrofitService::class.java)
-    }
 
     private fun getSearchList(service: RetrofitService, keyword: String){
         service.requestList(keyword).enqueue(object : Callback<PlayerList> {
-            override fun onFailure(call: Call<PlayerList>, t: Throwable) {
-                Log.d(TAG, "실패 : {$t}")
+            override fun onFailure(call: Call<PlayerList>, error: Throwable) {
+                Log.d("실패", "실패 원인: {$error}")
             }
 
             override fun onResponse(
                 call: Call<PlayerList>,
                 response: Response<PlayerList>
             ) {
-                Log.d(TAG, "성공")
-                textView.text = response.body().toString()
-                //reponse.body()는 PlayerList를 반환한다.
+                Log.d("성공", response.body().toString())
             }
         })
     }
